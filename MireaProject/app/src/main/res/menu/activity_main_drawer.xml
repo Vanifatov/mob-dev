@@ -28,5 +28,17 @@
             android:id="@+id/nav_Worker"
             android:icon="@android:drawable/ic_menu_search"
             android:title="Worker Fragment" />
+        <item
+            android:id="@+id/nav_geo"
+            android:icon="@android:drawable/ic_dialog_map"
+            android:title="Geo Fragment" />
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@android:drawable/ic_menu_camera"
+            android:title="Profile Fragment" />
+        <item
+            android:id="@+id/nav_voicemsg"
+            android:icon="@android:drawable/ic_btn_speak_now"
+            android:title="Voice Message Fragment" />
     </group>
 </menu>

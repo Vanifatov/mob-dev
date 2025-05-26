@@ -41,4 +41,22 @@
         android:label="fragment_worker"
         tools:layout="@layout/fragment_worker" />
 
+    <fragment
+        android:id="@+id/nav_geo"
+        android:name="com.mirea.vanifatov.mireaproject.GeoFragment"
+        android:label="Geo Fragment"
+        tools:layout="@layout/fragment_geo" />
+
+    <fragment
+        android:id="@+id/nav_profile"
+        android:name="com.mirea.vanifatov.mireaproject.ProfileFragment"
+        android:label="Profile Fragment"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/nav_voicemsg"
+        android:name="com.mirea.vanifatov.mireaproject.VoiceMesgFragment"
+        android:label="Voice Message Fragment"
+        tools:layout="@layout/fragment_voice_mesg" />
+
 </navigation>
