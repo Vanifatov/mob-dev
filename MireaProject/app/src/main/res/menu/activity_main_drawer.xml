@@ -40,5 +40,13 @@
             android:id="@+id/nav_voicemsg"
             android:icon="@android:drawable/ic_btn_speak_now"
             android:title="Voice Message Fragment" />
+        <item
+            android:id="@+id/nav_user_profile"
+            android:icon="@android:drawable/ic_menu_my_calendar"
+            android:title="User profile" />
+        <item
+            android:id="@+id/nav_convert_files"
+            android:icon="@android:drawable/ic_menu_always_landscape_portrait"
+            android:title="Convert Files" />
     </group>
 </menu>

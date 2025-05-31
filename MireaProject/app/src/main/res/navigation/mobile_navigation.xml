@@ -59,4 +59,16 @@
         android:label="Voice Message Fragment"
         tools:layout="@layout/fragment_voice_mesg" />
 
+    <fragment
+        android:id="@+id/nav_user_profile"
+        android:name="com.mirea.vanifatov.mireaproject.UserProfileFragment"
+        android:label="User profile"
+        tools:layout="@layout/fragment_user_profile" />
+
+    <fragment
+        android:id="@+id/nav_convert_files"
+        android:name="com.mirea.vanifatov.mireaproject.ConvertFilesFragment"
+        android:label="Convert Files"
+        tools:layout="@layout/fragment_convert_files" />
+
 </navigation>
