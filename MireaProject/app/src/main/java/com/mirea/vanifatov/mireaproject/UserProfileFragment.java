@@ -6,59 +6,43 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RadioGroup;
-import android.widget.Toast;
+
+import com.mirea.vanifatov.mireaproject.databinding.FragmentUserProfileBinding;
 
 public class UserProfileFragment extends Fragment {
-
-    private static final String PREFS_NAME = "ProfilePrefs";
-    private EditText etName, etAge, etEmail;
-    private RadioGroup rgGender;
-    private Button btnSave;
+    private FragmentUserProfileBinding binding;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
-
-        etName = view.findViewById(R.id.etName);
-        etAge = view.findViewById(R.id.etAge);
-        etEmail = view.findViewById(R.id.etEmail);
-        rgGender = view.findViewById(R.id.rgGender);
-        btnSave = view.findViewById(R.id.btnSave);
-
+        binding = FragmentUserProfileBinding.inflate(inflater, container, false);
         loadProfileData();
-
-        btnSave.setOnClickListener(v -> saveProfileData());
-
-        return view;
+        binding.buttonSave2.setOnClickListener(v -> saveProfileData());
+        return binding.getRoot();
     }
 
     private void saveProfileData() {
-        SharedPreferences prefs = requireActivity().getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences prefs = requireActivity().getSharedPreferences("profile_saved", 0);
         SharedPreferences.Editor editor = prefs.edit();
 
-        editor.putString("name", etName.getText().toString());
-        editor.putInt("age", Integer.parseInt(etAge.getText().toString()));
-        editor.putString("email", etEmail.getText().toString());
-        editor.putInt("gender", rgGender.getCheckedRadioButtonId());
+        editor.putString("Name", binding.editTextName.getText().toString());
+        editor.putInt("Age", Integer.parseInt(binding.editTextAge.getText().toString()));
+        editor.putString("E-mail", binding.editTextEmail.getText().toString());
+        editor.putInt("Gender", binding.radioGroupGender.getCheckedRadioButtonId());
 
         editor.apply();
-        Toast.makeText(getContext(), "Профиль сохранён", Toast.LENGTH_SHORT).show();
     }
 
     private void loadProfileData() {
-        SharedPreferences prefs = requireActivity().getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences prefs = requireActivity().getSharedPreferences("profile_saved", 0);
 
-        etName.setText(prefs.getString("name", ""));
-        etAge.setText(String.valueOf(prefs.getInt("age", 0)));
-        etEmail.setText(prefs.getString("email", ""));
+        binding.editTextName.setText(prefs.getString("Name", ""));
+        binding.editTextAge.setText(String.valueOf(prefs.getInt("Age", 0)));
+        binding.editTextEmail.setText(prefs.getString("E-mail", ""));
 
-        int genderId = prefs.getInt("gender", -1);
+        int genderId = prefs.getInt("Gender", -1);
         if (genderId != -1) {
-            rgGender.check(genderId);
+            binding.radioGroupGender.check(genderId);
         }
     }
 

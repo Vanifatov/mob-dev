@@ -5,21 +5,19 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
+import android.os.Environment;
+import android.text.InputType;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.os.Environment;
-import android.text.InputType;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.mirea.vanifatov.mireaproject.databinding.FragmentConvertFilesBinding;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,76 +27,61 @@ import java.io.InputStreamReader;
 
 public class ConvertFilesFragment extends Fragment {
 
-    private EditText eTNameFile;
-    private EditText eTQuote;
-    private Button bSave, bLoad, bConvert;
-    private FloatingActionButton fab;
+    private FragmentConvertFilesBinding binding;
 
     public ConvertFilesFragment() {
-        // Required empty public constructor
+
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Замените на ваш layout с нужными элементами
-        return inflater.inflate(R.layout.fragment_convert_files, container, false);
+        binding = FragmentConvertFilesBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        eTNameFile = view.findViewById(R.id.eT_namefile);
-        eTQuote = view.findViewById(R.id.eT_quote);
-        bSave = view.findViewById(R.id.b_save);
-        bLoad = view.findViewById(R.id.b_load);
-        bConvert = view.findViewById(R.id.b_convert);
-        fab = view.findViewById(R.id.fab);
+        setupClickListeners();
+    }
 
-        bSave.setOnClickListener(v -> saveFile());
-        bLoad.setOnClickListener(v -> loadFile());
-        bConvert.setOnClickListener(v -> convertFileToPdf());
-        fab.setOnClickListener(v -> showCreateRecordDialog());
+    private void setupClickListeners() {
+        binding.buttonSave.setOnClickListener(v -> saveFile());
+        binding.buttonLoad.setOnClickListener(v -> loadFile());
+        binding.buttonConvert.setOnClickListener(v -> convertFileToPdf());
+        binding.floatingButton.setOnClickListener(v -> createRecordNote());
     }
 
     private void saveFile() {
-        String fileName = eTNameFile.getText().toString().trim();
-        String content = eTQuote.getText().toString();
+        String filename = binding.textViewName.getText().toString().trim();
+        String quote = binding.textViewQuote.getText().toString();
 
-        if (fileName.isEmpty()) {
-            showToast("Введите название файла");
-            return;
-        }
 
         try {
             File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
             if (!path.exists()) path.mkdirs();
 
-            if (!fileName.endsWith(".txt")) {
-                fileName += ".txt";
+            if (!filename.endsWith(".txt")) {
+                filename += ".txt";
             }
 
-            File file = new File(path, fileName);
+            File file = new File(path, filename);
 
             try (FileOutputStream fos = new FileOutputStream(file, false)) {
-                fos.write(content.getBytes());
+                fos.write(quote.getBytes());
             }
 
-            showToast("Файл сохранён: " + file.getAbsolutePath());
+            Log.d("Save_File", "Файл сохранён по пути: " + file.getAbsolutePath());
+
         } catch (Exception e) {
-            showToast("Ошибка сохранения: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     private void loadFile() {
-        String fileName = eTNameFile.getText().toString().trim();
-
-        if (fileName.isEmpty()) {
-            showToast("Введите название файла");
-            return;
-        }
+        String fileName = binding.textViewName.getText().toString().trim();
 
         try {
             File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
@@ -108,11 +91,6 @@ public class ConvertFilesFragment extends Fragment {
             }
 
             File file = new File(path, fileName);
-
-            if (!file.exists()) {
-                showToast("Файл не найден");
-                return;
-            }
 
             StringBuilder content = new StringBuilder();
             try (BufferedReader reader = new BufferedReader(
@@ -125,42 +103,32 @@ public class ConvertFilesFragment extends Fragment {
                 }
             }
 
-            eTQuote.setText(content.toString().trim());
-            showToast("Данные успешно загружены");
+            binding.textViewQuote.setText(content.toString().trim());
 
         } catch (Exception e) {
-            showToast("Ошибка загрузки: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     private void convertFileToPdf() {
-        String fileName = eTNameFile.getText().toString().trim();
+        String fileName = binding.textViewName.getText().toString().trim();
 
-        if (fileName.isEmpty()) {
-            showToast("Введите название файла");
-            return;
-        }
 
         try {
             File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
             if (!path.exists()) path.mkdirs();
 
-            String txtFileName = fileName.endsWith(".txt") ? fileName : fileName + ".txt";
-            String pdfFileName = fileName.endsWith(".pdf") ? fileName : fileName + ".pdf";
+            String txt_filename = fileName.endsWith(".txt") ? fileName : fileName + ".txt";
+            String pdf_filename = fileName.endsWith(".pdf") ? fileName : fileName + ".pdf";
 
-            File txtFile = new File(path, txtFileName);
-            File pdfFile = new File(path, pdfFileName);
+            File txt_file = new File(path, txt_filename);
+            File pdf_file = new File(path, pdf_filename);
 
-            if (!txtFile.exists()) {
-                showToast("TXT файл не найден");
-                return;
-            }
 
             StringBuilder text = new StringBuilder();
             try (BufferedReader reader = new BufferedReader(
                     new InputStreamReader(
-                            new FileInputStream(txtFile), "UTF-8"))) {
+                            new FileInputStream(txt_file), "UTF-8"))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     text.append(line).append("\n");
@@ -168,7 +136,7 @@ public class ConvertFilesFragment extends Fragment {
             }
 
             PdfDocument pdfDocument = new PdfDocument();
-            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create(); // A4
+            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
             PdfDocument.Page page = pdfDocument.startPage(pageInfo);
 
             Canvas canvas = page.getCanvas();
@@ -183,45 +151,37 @@ public class ConvertFilesFragment extends Fragment {
 
             pdfDocument.finishPage(page);
 
-            try (FileOutputStream fos = new FileOutputStream(pdfFile)) {
+            try (FileOutputStream fos = new FileOutputStream(pdf_file)) {
                 pdfDocument.writeTo(fos);
             }
 
             pdfDocument.close();
 
-            showToast("Конвертация в PDF выполнена: " + pdfFile.getAbsolutePath());
-
         } catch (Exception e) {
-            showToast("Ошибка конвертации: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void showCreateRecordDialog() {
+    private void createRecordNote() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Создать запись");
 
         final EditText input = new EditText(requireContext());
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-        input.setHint("Введите текст записи");
         builder.setView(input);
 
         builder.setPositiveButton("Сохранить", (dialog, which) -> {
             String text = input.getText().toString().trim();
-            if (!text.isEmpty()) {
-                eTQuote.setText(text);
-                showToast("Запись добавлена");
-            } else {
-                showToast("Пустая запись не сохранена");
-            }
+            binding.textViewQuote.setText(text);
         });
 
         builder.setNegativeButton("Отмена", (dialog, which) -> dialog.cancel());
-
         builder.show();
     }
 
-    private void showToast(String message) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

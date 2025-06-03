@@ -1,10 +1,6 @@
 package com.mirea.vanifatov.internalfilestorage;
 
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Toast;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -26,14 +22,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         binding.button.setOnClickListener(v -> {
-            String date = binding.editTextText.getText().toString();
-            String description = binding.editTextText2.getText().toString();
-
-            if (!date.isEmpty() && !description.isEmpty()) {
-                saveToFile(date, description);
-            } else {
-                Toast.makeText(this, "Заполните все поля!", Toast.LENGTH_SHORT).show();
-            }
+            String date = binding.editTextData.getText().toString();
+            String note = binding.editTextNote.getText().toString();
+            saveFile(date, note);
         });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -43,18 +34,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void saveToFile(String date, String description) {
+    private void saveFile(String date, String note) {
         try {
-            FileOutputStream fos = openFileOutput(FILE_NAME, MODE_PRIVATE);
-            String content = "Дата: " + date + "\nОписание: " + description;
-            fos.write(content.getBytes());
-            fos.close();
-
-            Toast.makeText(this, "Файл сохранён!", Toast.LENGTH_SHORT).show();
-            Log.d("FileSave", "Файл записан: " + getFilesDir() + "/" + FILE_NAME);
-
+            FileOutputStream file = openFileOutput(FILE_NAME, MODE_PRIVATE);
+            String content = "Дата: " + date + "\nОписание: " + note;
+            file.write(content.getBytes());
+            file.close();
         } catch (IOException e) {
-            Toast.makeText(this, "Ошибка: " + e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
     }

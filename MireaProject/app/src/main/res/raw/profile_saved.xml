@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
 <map>
-    <int name="gender" value="2131231276" />
-    <string name="name">Артём</string>
-    <int name="age" value="23" />
-    <string name="email">Van_Art@gmail.com</string>
+    <string name="E-mail">art_van@gmail.com</string>
+    <int name="Gender" value="2131231292" />
+    <int name="Age" value="23" />
+    <string name="Name">Артём</string>
 </map>

@@ -7,12 +7,11 @@
     tools:context=".ConvertFilesFragment">
 
     <EditText
-        android:id="@+id/eT_namefile"
+        android:id="@+id/textViewName"
         android:layout_width="320dp"
-        android:layout_height="65dp"
+        android:layout_height="50dp"
         android:ems="10"
         android:inputType="text"
-        android:text="Название файла"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
@@ -21,64 +20,91 @@
         app:layout_constraintVertical_bias="0.084" />
 
     <EditText
-        android:id="@+id/eT_quote"
-        android:layout_width="363dp"
-        android:layout_height="98dp"
+        android:id="@+id/textViewQuote"
+        android:layout_width="320dp"
+        android:layout_height="50dp"
         android:ems="10"
         android:inputType="text"
-        android:text="Цитата"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.268" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewName"
+        app:layout_constraintVertical_bias="0.064" />
 
     <Button
-        android:id="@+id/b_save"
-        android:layout_width="172dp"
-        android:layout_height="78dp"
+        android:id="@+id/buttonSave"
+        android:layout_width="180dp"
+        android:layout_height="60dp"
         android:text="Сохранить данные"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.506"
+        app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.462" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewQuote"
+        app:layout_constraintVertical_bias="0.051" />
 
     <Button
-        android:id="@+id/b_load"
-        android:layout_width="170dp"
-        android:layout_height="82dp"
+        android:id="@+id/buttonLoad"
+        android:layout_width="180dp"
+        android:layout_height="60dp"
         android:text="Загрузить данные"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.51"
+        app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.631" />
+        app:layout_constraintTop_toBottomOf="@+id/buttonSave"
+        app:layout_constraintVertical_bias="0.055" />
 
     <Button
-        android:id="@+id/b_convert"
-        android:layout_width="206dp"
-        android:layout_height="79dp"
-        android:text="Конвертировать данные"
+        android:id="@+id/buttonConvert"
+        android:layout_width="180dp"
+        android:layout_height="60dp"
+        android:text="Конвертировать данные в PDF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.808" />
+        app:layout_constraintTop_toBottomOf="@+id/buttonLoad"
+        app:layout_constraintVertical_bias="0.061" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/floatingButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="456dp"
         android:src="@drawable/side_nav_bar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.067"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.045"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewQuote"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textView10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Название файла:"
+        app:layout_constraintBottom_toTopOf="@+id/textViewName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.15"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Цитата:"
+        app:layout_constraintBottom_toTopOf="@+id/textViewQuote"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.125"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

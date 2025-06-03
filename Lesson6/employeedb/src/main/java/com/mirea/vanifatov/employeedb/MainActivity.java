@@ -1,20 +1,16 @@
 package com.mirea.vanifatov.employeedb;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Dao;
 import androidx.room.Database;
+import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Entity;
 import androidx.room.Insert;
@@ -32,38 +28,42 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-    private static final String TAG = "MainActivity";
+    private AppDatabase db;
+    private SuperheroDao dao;
+    private SuperHeroesAdapter heroAdapter;
+    private long selectedHeroId = -1;
 
-    @Entity(tableName = "superhero")
-    public static class Superhero {
+    @Entity(tableName = "superheroes")
+    public static class Superheroes {
         @PrimaryKey(autoGenerate = true)
         public long id;
         public String name;
-        public String superpower;
-        public String universe;
+        public String surname;
+        public String age;
     }
 
     @Dao
     public interface SuperheroDao {
-        @Query("SELECT * FROM superhero")
-        List<Superhero> getAll();
-        @Query("SELECT * FROM superhero WHERE id = :id")
-        Superhero getById(long id);
+        @Query("SELECT * FROM Superheroes")
+        List<Superheroes> getAll();
+
+        @Query("SELECT * FROM Superheroes WHERE id = :id")
+        Superheroes getId(long id);
+
         @Insert
-        void insert(Superhero superhero);
+        void ins(Superheroes superheroes);
+
         @Update
-        void update(Superhero superhero);
+        void upd(Superheroes superheroes);
+
         @Delete
-        void delete(Superhero superhero);
+        void del(Superheroes superheroes);
     }
-    @Database(entities = {Superhero.class}, version = 1)
+
+    @Database(entities = {Superheroes.class}, version = 3, exportSchema = false)
     public abstract static class AppDatabase extends RoomDatabase {
         public abstract SuperheroDao superheroDao();
     }
-    private AppDatabase db;
-    private SuperheroDao dao;
-    private SuperheroAdapter adapter;
-    private long selectedHeroId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,115 +71,101 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        try {
+            db = Room.databaseBuilder(getApplicationContext(),
+                            AppDatabase.class, "superheroes_db")
+                    .allowMainThreadQueries()
+                    .fallbackToDestructiveMigration()
+                    .build();
+            dao = db.superheroDao();
+        } catch (Exception e) {
+            Log.e("DB_ERROR", "Database initialization failed", e);
+            finish();
+            return;
+        }
 
-        db = Room.databaseBuilder(getApplicationContext(),
-                        AppDatabase.class, "superheroes_db")
-                .allowMainThreadQueries()
-                .build();
-        dao = db.superheroDao();
-
-        binding.recycler.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new SuperheroAdapter(new ArrayList<>());
-        binding.recycler.setAdapter(adapter);
-
-        loadHeroesToList();
-
-        binding.button.setOnClickListener(v -> {
-            String name = binding.editTextText.getText().toString().trim();
-            String power = binding.editTextText2.getText().toString().trim();
-            String universe = binding.editTextText3.getText().toString().trim();
-
-            if (name.isEmpty()) {
-                Toast.makeText(this, "Введите имя героя", Toast.LENGTH_LONG).show();
-                return;
-            }
-            Superhero hero = new Superhero();
-            hero.name = name;
-            hero.superpower = power;
-            hero.universe = universe;
-
-            dao.insert(hero);
-            Toast.makeText(this, "Герой добавлен", Toast.LENGTH_LONG).show();
-            clearFields();
-            loadHeroesToList();
-        });
-
-        binding.button2.setOnClickListener(v -> {
-            if (selectedHeroId == -1) {
-                Toast.makeText(this, "Выберите героя из списка для обновления", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            String name = binding.editTextText.getText().toString().trim();
-            String power = binding.editTextText2.getText().toString().trim();
-            String universe = binding.editTextText3.getText().toString().trim();
-
-            if (name.isEmpty()) {
-                Toast.makeText(this, "Введите имя героя", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            Superhero hero = dao.getById(selectedHeroId);
-            if (hero == null) {
-                Toast.makeText(this, "Герой не найден", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            hero.name = name;
-            hero.superpower = power;
-            hero.universe = universe;
-
-            dao.update(hero);
-            Toast.makeText(this, "Герой обновлён", Toast.LENGTH_LONG).show();
-            clearFields();
-            selectedHeroId = -1;
-            loadHeroesToList();
-        });
-
-        binding.button3.setOnClickListener(v -> {
-            if (selectedHeroId == -1) {
-                Toast.makeText(this, "Выберите героя из списка для удаления", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            Superhero hero = dao.getById(selectedHeroId);
-            if (hero == null) {
-                Toast.makeText(this, "Герой не найден", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            dao.delete(hero);
-            Toast.makeText(this, "Герой удалён", Toast.LENGTH_LONG).show();
-            clearFields();
-            selectedHeroId = -1;
-            loadHeroesToList();
-        });
+        setupRecyclerView();
+        setupButtons();
     }
 
-    private void loadHeroesToList() {
-        List<Superhero> heroes = dao.getAll();
-        adapter.setHeroes(heroes);
+    private void setupRecyclerView() {
+        heroAdapter = new SuperHeroesAdapter(new ArrayList<>());
+        binding.recyclerList.setLayoutManager(new LinearLayoutManager(this));
+        binding.recyclerList.setAdapter(heroAdapter);
+        loadHeroes();
+    }
+
+    private void setupButtons() {
+        binding.buttonAdd.setOnClickListener(v -> addHero());
+        binding.buttonEdit.setOnClickListener(v -> editHero());
+        binding.buttonDel.setOnClickListener(v -> deleteHero());
+    }
+
+    private void addHero() {
+        String name = binding.editTextName.getText().toString().trim();
+        String surname = binding.editTextSName.getText().toString().trim();
+        String age = binding.editTextAge.getText().toString().trim();
+
+        Superheroes hero = new Superheroes();
+        hero.name = name;
+        hero.surname = surname;
+        hero.age = age;
+
+        dao.ins(hero);
+        clearFields();
+        loadHeroes();
+    }
+
+    private void editHero() {
+        String name = binding.editTextName.getText().toString().trim();
+        String surname = binding.editTextSName.getText().toString().trim();
+        String age = binding.editTextAge.getText().toString().trim();
+
+        Superheroes hero = dao.getId(selectedHeroId);
+
+        hero.name = name;
+        hero.surname = surname;
+        hero.age = age;
+
+        dao.upd(hero);
+        clearFields();
+        selectedHeroId = -1;
+        loadHeroes();
+    }
+
+    private void deleteHero() {
+
+        Superheroes hero = dao.getId(selectedHeroId);
+        dao.del(hero);
+        clearFields();
+        selectedHeroId = -1;
+        loadHeroes();
+    }
+
+    private void loadHeroes() {
+        try {
+            List<Superheroes> heroes = dao.getAll();
+            heroAdapter.setHeroes(heroes);
+        } catch (Exception e) {
+            Log.e("DB_ERROR", "Ошибка при загрузке БД", e);
+        }
     }
 
     private void clearFields() {
-        binding.editTextText.setText("");
-        binding.editTextText2.setText("");
-        binding.editTextText3.setText("");
+        binding.editTextName.setText("");
+        binding.editTextSName.setText("");
+        binding.editTextAge.setText("");
     }
 
-    private class SuperheroAdapter extends RecyclerView.Adapter<SuperheroAdapter.HeroViewHolder> {
+    private class SuperHeroesAdapter extends RecyclerView.Adapter<SuperHeroesAdapter.HeroViewHolder> {
+        private List<Superheroes> heroes;
 
-        private List<Superhero> heroes;
-        public SuperheroAdapter(List<Superhero> heroes) {
-            this.heroes = heroes;
+        public SuperHeroesAdapter(List<Superheroes> heroes) {
+            this.heroes = heroes != null ? heroes : new ArrayList<>();
         }
-        public void setHeroes(List<Superhero> heroes) {
-            this.heroes = heroes;
+
+        public void setHeroes(List<Superheroes> heroes) {
+            this.heroes = heroes != null ? heroes : new ArrayList<>();
             notifyDataSetChanged();
         }
 
@@ -192,8 +178,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull HeroViewHolder holder, int position) {
-            Superhero hero = heroes.get(position);
-            holder.bind(hero);
+            holder.bind(heroes.get(position));
         }
 
         @Override
@@ -202,24 +187,26 @@ public class MainActivity extends AppCompatActivity {
         }
 
         class HeroViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-            private android.widget.TextView textView;
-            private Superhero currentHero;
+            private final android.widget.TextView textView;
+            private Superheroes hero;
+
             public HeroViewHolder(@NonNull View itemView) {
                 super(itemView);
                 textView = itemView.findViewById(android.R.id.text1);
                 itemView.setOnClickListener(this);
             }
-            void bind(Superhero hero) {
-                currentHero = hero;
-                textView.setText(hero.name + " (" + hero.universe + ")");
+
+            void bind(Superheroes hero) {
+                this.hero = hero;
+                textView.setText(hero.name + " | " + hero.surname + " | " + hero.age);
             }
+
             @Override
             public void onClick(View v) {
-                selectedHeroId = currentHero.id;
-                binding.editTextText.setText(currentHero.name);
-                binding.editTextText2.setText(currentHero.superpower);
-                binding.editTextText3.setText(currentHero.universe);
-                Toast.makeText(MainActivity.this, "Герой выбран: " + currentHero.name, Toast.LENGTH_LONG).show();
+                selectedHeroId = hero.id;
+                binding.editTextName.setText(hero.name);
+                binding.editTextSName.setText(hero.surname);
+                binding.editTextAge.setText(hero.age);
             }
         }
     }
