@@ -48,5 +48,9 @@
             android:id="@+id/nav_convert_files"
             android:icon="@android:drawable/ic_menu_always_landscape_portrait"
             android:title="Convert Files" />
+        <item
+            android:id="@+id/nav_web_firebase"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Web Firebase" />
     </group>
 </menu>

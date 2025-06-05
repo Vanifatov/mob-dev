@@ -71,4 +71,22 @@
         android:label="Convert Files"
         tools:layout="@layout/fragment_convert_files" />
 
+    <fragment
+        android:id="@+id/nav_web_firebase"
+        android:name="com.mirea.vanifatov.mireaproject.FragmentFireBase"
+        android:label="Web Firebase"
+        tools:layout="@layout/fragment_fire_base">
+
+        <action
+            android:id="@+id/navigation_fb_web"
+            app:destination="@id/nav_web_fb" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_web_fb"
+        android:name="com.mirea.vanifatov.mireaproject.FragmentWeb"
+        android:label="Fragment web"
+        tools:layout="@layout/fragment_web" />
+
 </navigation>
